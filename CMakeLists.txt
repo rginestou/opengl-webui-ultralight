@@ -1,0 +1,30 @@
+project(Ultralight C CXX)
+
+cmake_minimum_required(VERSION 2.8.12)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+set(ULTRALIGHT_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include")
+set(GLFW_SOURCE_DIR "${PROJECT_SOURCE_DIR}/deps/glfw")
+
+# Disable various GLFW options
+option(GLFW_BUILD_EXAMPLES "Build the GLFW example programs" OFF)
+option(GLFW_BUILD_TESTS "Build the GLFW test programs" OFF)
+option(GLFW_BUILD_DOCS "Build the GLFW documentation" OFF)
+option(GLFW_INSTALL "Generate installation target" OFF)
+
+if (WIN32)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(ULTRALIGHT_LIBRARY_DIRS "${PROJECT_SOURCE_DIR}/lib/win/x64")
+        set(ULTRALIGHT_BINARY_DIRS "${PROJECT_SOURCE_DIR}/bin/win/x64")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(ULTRALIGHT_LIBRARY_DIRS "${PROJECT_SOURCE_DIR}/lib/win/x86")
+        set(ULTRALIGHT_BINARY_DIRS "${PROJECT_SOURCE_DIR}/bin/win/x86")
+    endif()
+endif ()
+
+add_subdirectory(deps)
+add_subdirectory(app)
