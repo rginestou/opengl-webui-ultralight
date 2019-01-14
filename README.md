@@ -2,6 +2,10 @@
 
 This project is a simple C++ OpenGL GLFW application with a HTML/CSS UI overlay powered by the very promising [Ultralight](https://github.com/ultralight-ux/ultralight) library.
 
+<p align="center">
+  <img height="300" src="https://rginestou.io/opengl-ultralight-demo.gif">
+</p>
+
 > **Motivation**
 >
 > The extensive use of web browsers (desktop and mobile) to access services and information has driven web UIs to be extremely powerful, user friendly and beautiful. The underlying technologies (HTML, CSS, ...) are very easy to use as a developer. On the other hand, the lack of nice, efficient and simple UI technologies for native desktop applications only adds to the contrast between the web and desktop worlds.
