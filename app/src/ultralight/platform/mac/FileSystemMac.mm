@@ -486,9 +486,14 @@ bool FileSystemMac::appendFileContentsToFileHandle(const String16& path, FileHan
 
     // This shouldn't be reached.
     return false;
-} 
-}  // namespace framework
+}
+    
+} // namespace ultralight
 
+namespace framework {
+    
 ultralight::FileSystem* CreatePlatformFileSystem(const char* baseDir) {
     return new ultralight::FileSystemMac(baseDir);
 }
+    
+}  // namespace framework

@@ -1,4 +1,4 @@
-#include "FileSystemBasic.h"
+#include "../../platform/common/FileSystemBasic.h"
 #include <Ultralight/String.h>
 #include <cstring>
 #include <fstream>
@@ -101,11 +101,13 @@ int64_t FileSystemBasic::ReadFromFile(FileHandle handle, char* data, int64_t len
 
   return 0;
 }
-}
+
+} // namespace ultralight
 
 ultralight::FileSystem* CreatePlatformFileSystem(const char* baseDir) {
   return new ultralight::FileSystemBasic(baseDir);
-}
+
+} // namespace ultralight
 
 const char* FileExtensionToMimeType(const char* ext) {
   if (!strcmp(ext, "323"))

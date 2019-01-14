@@ -35,6 +35,7 @@ set(APP_SRC
 
 set(ULTRALIGHT_BINDINGS_SRC
     "src/ultralight/gpu_context.h"
+    "src/ultralight/gpu_context.cpp"
     "src/ultralight/js_helpers.h"
     "src/ultralight/js_helpers.cpp"
     "src/ultralight/gpu_driver_gl.h"
@@ -48,25 +49,25 @@ set(ULTRALIGHT_SHADER_SRC
 
 if (WIN32)
 list(APPEND ULTRALIGHT_SRC
-    "src/common/FileSystemBasic.h"
-    "src/common/FileSystemBasic.cpp"
-    "src/win/FontLoaderWin.h"
-    "src/win/FontLoaderWin.cpp")
+    "src/ultralight/platform/common/FileSystemBasic.h"
+    "src/ultralight/platform/common/FileSystemBasic.cpp"
+    "src/ultralight/platform/win/FontLoaderWin.h"
+    "src/ultralight/platform/win/FontLoaderWin.cpp")
 elseif (APPLE)
 list(APPEND ULTRALIGHT_SRC
-    "src/ultralight/mac/FileSystemMac.h"
-    "src/ultralight/mac/FileSystemMac.mm"
-    "src/ultralight/mac/FontLoaderMac.h"
-    "src/ultralight/mac/FontLoaderMac.mm")
+    "src/ultralight/platform/mac/FileSystemMac.h"
+    "src/ultralight/platform/mac/FileSystemMac.mm"
+    "src/ultralight/platform/mac/FontLoaderMac.h"
+    "src/ultralight/platform/mac/FontLoaderMac.mm")
 
 set(ULTRALIGHT_LIBRARY_DIRS "${PROJECT_SOURCE_DIR}/bin/mac")
 set(ULTRALIGHT_BINARY_DIRS "${PROJECT_SOURCE_DIR}/bin/mac")
 elseif (UNIX)
 list(APPEND ULTRALIGHT_SRC
-    "src/ultralight/common/FileSystemBasic.h"
-    "src/ultralight/common/FileSystemBasic.cpp"
-    "src/ultralight/common/FontLoaderRoboto.h"
-    "src/ultralight/common/FontLoaderRoboto.cpp")
+    "src/ultralight/platform/common/FileSystemBasic.h"
+    "src/ultralight/platform/common/FileSystemBasic.cpp"
+    "src/ultralight/platform/common/FontLoaderRoboto.h"
+    "src/ultralight/platform/common/FontLoaderRoboto.cpp")
 
 set(ULTRALIGHT_LIBRARY_DIRS "${PROJECT_SOURCE_DIR}/bin/linux")
 set(ULTRALIGHT_BINARY_DIRS "${PROJECT_SOURCE_DIR}/bin/linux")

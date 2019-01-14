@@ -40,17 +40,7 @@
   }
 #endif
 
-#ifdef _DEBUG
-#define CHECK_GL()                 \
-  {                                \
-    if (GLenum err = glGetError()) \
-      FATAL(glErrorString(err))    \
-  }
-#else
-#define CHECK_GL()
-#endif
-
-void readFile(const char* filepath, std::string& result) {
+static void ReadFile(const char* filepath, std::string& result) {
   // To maintain predictable behavior across platforms we use
   // whatever FileSystem that Ultralight is using:
   ultralight::FileSystem* fs = ultralight::Platform::instance().file_system();
@@ -93,7 +83,7 @@ inline char const* glErrorString(GLenum const err) noexcept {
   }
 }
 
-inline std::string getShaderLog(GLuint shader_id) {
+inline std::string GetShaderLog(GLuint shader_id) {
   GLint length, result;
   glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &length);
   std::string str(length, ' ');
@@ -101,7 +91,7 @@ inline std::string getShaderLog(GLuint shader_id) {
   return str;
 }
 
-inline std::string getProgramLog(GLuint program_id) {
+inline std::string GetProgramLog(GLuint program_id) {
   GLint length, result;
   glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &length);
   std::string str(length, ' ');
@@ -109,10 +99,10 @@ inline std::string getProgramLog(GLuint program_id) {
   return str;
 }
 
-GLuint loadShaderFromFile(GLenum shader_type, const char* filename) {
+static GLuint LoadShaderFromFile(GLenum shader_type, const char* filename) {
   std::string shader_source;
   std::string path = std::string(SHADER_PATH) + filename;
-  readFile(path.c_str(), shader_source);
+  ReadFile(path.c_str(), shader_source);
   GLint compileStatus;
   const char* shader_source_str = shader_source.c_str();
   GLuint shader_id = glCreateShader(shader_type);
@@ -121,10 +111,19 @@ GLuint loadShaderFromFile(GLenum shader_type, const char* filename) {
   glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compileStatus);
   if (compileStatus == GL_FALSE)
     FATAL("Unable to compile shader. Filename: " << filename << "\n\tError:"
-                                                 << glErrorString(glGetError())
-                                                 << "\n\tLog: " << getShaderLog(shader_id))
+                                                 << glErrorString(glGetError()) << "\n\tLog: " << GetShaderLog(shader_id))
   return shader_id;
 }
+
+#ifdef _DEBUG
+#define CHECK_GL()                 \
+  {                                \
+    if (GLenum err = glGetError()) \
+      FATAL(glErrorString(err))    \
+  }
+#else
+#define CHECK_GL()
+#endif
 
 namespace ultralight {
 
@@ -252,6 +251,8 @@ void GPUDriverGL::ClearRenderBuffer(uint32_t render_buffer_id) {
   BindRenderBuffer(render_buffer_id);
   glDisable(GL_SCISSOR_TEST);
   CHECK_GL();
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  CHECK_GL();
   glClear(GL_COLOR_BUFFER_BIT);
   CHECK_GL();
 }
@@ -368,6 +369,8 @@ void GPUDriverGL::DrawGeometry(uint32_t geometry_id,
   CHECK_GL();
 
   BindTexture(0, state.texture_1_id);
+  BindTexture(1, state.texture_2_id);
+  BindTexture(2, state.texture_3_id);
 
   CHECK_GL();
 
@@ -409,6 +412,8 @@ void GPUDriverGL::DrawCommandList() {
 
   glEnable(GL_BLEND);
   glDisable(GL_SCISSOR_TEST);
+  glDisable(GL_DEPTH_TEST);
+  glDepthFunc(GL_NEVER);
   glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
   CHECK_GL();
@@ -458,11 +463,11 @@ void GPUDriverGL::LoadProgram(ProgramType type) {
   GLenum ErrorCheckValue = glGetError();
   ProgramEntry prog;
   if (type == kShaderType_Fill) {
-    prog.vert_shader_id = loadShaderFromFile(GL_VERTEX_SHADER, "v2f_c4f_t2f_t2f_d28f.vert");
-    prog.frag_shader_id = loadShaderFromFile(GL_FRAGMENT_SHADER, "fill.frag");
+    prog.vert_shader_id = LoadShaderFromFile(GL_VERTEX_SHADER, "v2f_c4f_t2f_t2f_d28f.vert");
+    prog.frag_shader_id = LoadShaderFromFile(GL_FRAGMENT_SHADER, "fill.frag");
   } else if (type == kShaderType_FillPath) {
-    prog.vert_shader_id = loadShaderFromFile(GL_VERTEX_SHADER, "v2f_c4f_t2f.vert");
-    prog.frag_shader_id = loadShaderFromFile(GL_FRAGMENT_SHADER, "fill_path.frag");
+    prog.vert_shader_id = LoadShaderFromFile(GL_VERTEX_SHADER, "v2f_c4f_t2f.vert");
+    prog.frag_shader_id = LoadShaderFromFile(GL_FRAGMENT_SHADER, "fill_path.frag");
   }
 
   prog.program_id = glCreateProgram();
@@ -494,7 +499,7 @@ void GPUDriverGL::LoadProgram(ProgramType type) {
   }
 
   if (glGetError())
-    FATAL("Unable to link shader.\n\tError:" << glErrorString(glGetError()) << "\n\tLog: " << getProgramLog(prog.program_id))
+    FATAL("Unable to link shader.\n\tError:" << glErrorString(glGetError()) << "\n\tLog: " << GetProgramLog(prog.program_id))
 
   programs_[type] = prog;
 }

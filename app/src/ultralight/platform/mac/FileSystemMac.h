@@ -66,7 +66,7 @@ protected:
     String16 getRelative(const String16& path);
     bool appendFileContentsToFileHandle(const String16& path, FileHandle target);
 };
-
+    
 }  // namespace ultralight
 
     

@@ -1,11 +1,15 @@
 #include "gui.h"
-#include "window.h"
 
 #include <Ultralight/Buffer.h>
 #include <Ultralight/Renderer.h>
 #include <Ultralight/platform/Config.h>
 #include <Ultralight/platform/Platform.h>
-#include <iostream>
+
+#include <Ultralight/platform/FileSystem.h>
+#include <Ultralight/platform/FontLoader.h>
+
+ultralight::FontLoader* CreatePlatformFontLoader();
+ultralight::FileSystem* CreatePlatformFileSystem(const char* baseDir);
 
 using namespace ultralight;
 
@@ -16,37 +20,17 @@ GUI::GUI(Window& window) : _window(window) {
   config.face_winding = _gpu_context->face_winding();
   config.device_scale_hint = _window.scale();
 
+  _driver = _gpu_context->driver();
+
   // Setup our Platform API handlers
   ultralight::Platform& platform = ultralight::Platform::instance();
   platform.set_config(config);
-  platform.set_gpu_driver(_gpu_context->driver());
+  platform.set_gpu_driver(_driver);
   platform.set_font_loader(CreatePlatformFontLoader());
   platform.set_file_system(CreatePlatformFileSystem("assets/"));
 
-  _driver = _gpu_context->driver();
   _renderer = ultralight::Renderer::Create();
   _view = _renderer->CreateView(window.width(), window.height(), true);
-
-  // Screen geometry
-  _vertices.resize(4);
-  _indices = { 0, 3, 1, 1, 3, 2 };
-  _geometry_id = _driver->NextGeometryId();
-
-  Matrix identity;
-  identity.SetIdentity();
-
-  RenderTarget target = _view->render_target();
-  _gpu_state.viewport_width = _window.width() * _window.scale();
-  _gpu_state.viewport_height = _window.height() * _window.scale();
-  _gpu_state.transform = ConvertAffineTo4x4(identity);
-  _gpu_state.enable_blend = true;
-  _gpu_state.enable_texturing = true;
-  _gpu_state.shader_type = kShaderType_Fill;
-  _gpu_state.render_buffer_id = 0; // default render target view (screen)
-  _gpu_state.texture_1_id = target.texture_id;
-
-  // At this point, GL Context is defined
-  updateGeometry();
 
   _view->set_view_listener(this);
   _view->set_load_listener(this);
@@ -64,7 +48,8 @@ GUI::~GUI() {
   platform.set_font_loader(nullptr);
   platform.set_gpu_driver(nullptr);
 
-  _driver->DestroyGeometry(_geometry_id);
+  if (_vertices.size())
+    _driver->DestroyGeometry(_geometry_id);
 
   _view->set_load_listener(nullptr);
   _view->set_view_listener(nullptr);
@@ -83,10 +68,13 @@ void GUI::OnDOMReady(ultralight::View* caller) {
 
 void GUI::draw() {
   _renderer->Update();
-  _driver->BeginSynchronize();
-
   _renderer->Render();
+
+  _gpu_context->BeginDrawing();
   _driver->DrawCommandList();
+  _gpu_context->EndDrawing();
+
+  updateGeometry();
 
   glDisable(GL_DEPTH_TEST);
   glDepthFunc(GL_NEVER);
@@ -95,8 +83,6 @@ void GUI::draw() {
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
-
-  _driver->EndSynchronize();
 }
 
 void GUI::fireKeyEvent(const ultralight::KeyEvent& evt) {
@@ -112,7 +98,7 @@ void GUI::fireScrollEvent(const ultralight::ScrollEvent& evt) {
 }
 
 void GUI::resize(int width, int height) {
-  _gpu_context->resize(width, height);
+  _gpu_context->Resize(width, height);
   _view->Resize(width, height);
 
   updateGeometry();
@@ -141,7 +127,34 @@ void GUI::onShowEvent(bool show) {
 }
 
 void GUI::updateGeometry() {
+  bool initial_creation = false;
   RenderTarget target = _view->render_target();
+
+  if (_vertices.empty()) {
+    _vertices.resize(4);
+    _indices.resize(6);
+
+    int patternCCW[] = { 0, 3, 1, 1, 3, 2 };
+    memcpy(_indices.data(), patternCCW, sizeof(int) * _indices.size());
+
+    memset(&_gpu_state, 0, sizeof(_gpu_state));
+    ultralight::Matrix identity;
+    identity.SetIdentity();
+
+    _gpu_state.viewport_width = (float)_window.width();
+    _gpu_state.viewport_height = (float)_window.height();
+    _gpu_state.transform = ConvertAffineTo4x4(identity);
+    _gpu_state.enable_blend = true;
+    _gpu_state.enable_texturing = true;
+    _gpu_state.shader_type = ultralight::kShaderType_Fill;
+    _gpu_state.render_buffer_id = 0; // default render target view (screen)
+    _gpu_state.texture_1_id = target.texture_id;
+
+    initial_creation = true;
+  }
+
+  if (!_needs_update)
+    return;
 
   Vertex_2f_4ub_2f_2f_28f v;
   memset(&v, 0, sizeof(v));
@@ -199,9 +212,9 @@ void GUI::updateGeometry() {
   ibuffer.size = (uint32_t)(sizeof(ultralight::IndexType) * _indices.size());
   ibuffer.data = (uint8_t*)_indices.data();
 
-  if (!_initialized) {
+  if (initial_creation) {
+    _geometry_id = _driver->NextGeometryId();
     _driver->CreateGeometry(_geometry_id, vbuffer, ibuffer);
-    _initialized = true;
     return;
   }
 

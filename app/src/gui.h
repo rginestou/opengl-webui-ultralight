@@ -59,7 +59,6 @@ private:
   std::vector<ultralight::IndexType> _indices;
 
   bool _needs_update = true;
-  bool _initialized = false;
 
   JSFunction setButtonText;
 };

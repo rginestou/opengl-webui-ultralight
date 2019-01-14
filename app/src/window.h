@@ -27,11 +27,11 @@ public:
 class Window {
 public:
   Window(const WindowOptions& opt);
-
   ~Window();
-  void set_listener(WindowListener* listener) { _listener = listener; }
 
   WindowListener* listener() { return _listener; }
+  void set_listener(WindowListener* listener) { _listener = listener; }
+
   GLFWwindow* handle() const { return _window; }
 
   int width() const;

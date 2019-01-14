@@ -1,35 +1,27 @@
 #pragma once
-#include "gpu_driver_gl.h"
 #include "../gl/glinclude.h"
-
 #include <GLFW/glfw3.h>
-#include <memory>
-#include <Ultralight/platform/Config.h>
-#include <Ultralight/platform/FileSystem.h>
-#include <Ultralight/platform/FontLoader.h>
-#include <Ultralight/platform/GPUDriver.h>
 
-    ultralight::FontLoader *
-    CreatePlatformFontLoader();
-ultralight::FileSystem* CreatePlatformFileSystem(const char* baseDir);
+#include <Ultralight/platform/Config.h>
+#include <Ultralight/platform/GPUDriver.h>
+#include <memory>
 
 class GPUContext {
-protected:
-  std::unique_ptr<ultralight::GPUDriver> _driver;
-  GLFWwindow* _window;
-
 public:
-  GPUContext(GLFWwindow* glfw_window, float scale) : _window(glfw_window) {
-    _driver.reset(new ultralight::GPUDriverGL(scale));
-  }
+  GPUContext(GLFWwindow* window, double scale);
+  ~GPUContext();
 
-  ~GPUContext() {}
+  ultralight::GPUDriver* driver() const;
+  ultralight::FaceWinding face_winding() const;
 
-  ultralight::GPUDriver* driver() const { return _driver.get(); }
-  ultralight::FaceWinding face_winding() const { return ultralight::kFaceWinding_CounterClockwise; }
+  void BeginDrawing();
+  void EndDrawing();
 
-  void resize(int width, int height) {
-    ultralight::GPUDriverGL* driver_gl = static_cast<ultralight::GPUDriverGL*>(_driver.get());
-    driver_gl->SetViewport(width, height);
-  }
+  // Should only be called during drawing phase
+  void PresentFrame();
+  void Resize(int width, int height);
+
+private:
+  std::unique_ptr<ultralight::GPUDriver> driver_;
+  GLFWwindow* window_;
 };
