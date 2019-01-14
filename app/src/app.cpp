@@ -30,7 +30,7 @@ void Application::run() {
   float t_init = (float)glfwGetTime();
   while (!glfwWindowShouldClose(_window.handle())) {
     float t = (float)glfwGetTime() - t_init;
-    glViewport(0, 0, _window.width(), _window.height());
+    glViewport(0, 0, _window.width() * _window.scale(), _window.height() * _window.scale());
 
     // Clear buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

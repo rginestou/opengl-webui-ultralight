@@ -15,21 +15,21 @@ ultralight::FileSystem* CreatePlatformFileSystem(const char* baseDir);
 
 class GPUContext {
 protected:
-  std::unique_ptr<ultralight::GPUDriver> driver_;
-  GLFWwindow* window_;
+  std::unique_ptr<ultralight::GPUDriver> _driver;
+  GLFWwindow* _window;
 
 public:
-  GPUContext(GLFWwindow* glfw_window) : window_(glfw_window) {
-    driver_.reset(new ultralight::GPUDriverGL(1.0));
+  GPUContext(GLFWwindow* glfw_window, float scale) : _window(glfw_window) {
+    _driver.reset(new ultralight::GPUDriverGL(scale));
   }
 
   ~GPUContext() {}
 
-  ultralight::GPUDriver* driver() const { return driver_.get(); }
+  ultralight::GPUDriver* driver() const { return _driver.get(); }
   ultralight::FaceWinding face_winding() const { return ultralight::kFaceWinding_CounterClockwise; }
 
   void resize(int width, int height) {
-    ultralight::GPUDriverGL* driver_gl = static_cast<ultralight::GPUDriverGL*>(driver_.get());
+    ultralight::GPUDriverGL* driver_gl = static_cast<ultralight::GPUDriverGL*>(_driver.get());
     driver_gl->SetViewport(width, height);
   }
 };

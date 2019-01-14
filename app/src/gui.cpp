@@ -10,7 +10,7 @@
 using namespace ultralight;
 
 GUI::GUI(Window& window) : _window(window) {
-  _gpu_context.reset(new GPUContext(_window.handle()));
+  _gpu_context.reset(new GPUContext(_window.handle(), _window.scale()));
 
   ultralight::Config config;
   config.face_winding = _gpu_context->face_winding();
