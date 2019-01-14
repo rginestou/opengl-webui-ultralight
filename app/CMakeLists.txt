@@ -7,7 +7,7 @@ if (NOT APPLE)
     link_libraries(glfw ${OPENGL_LIBRARIES} GLEW UltralightCore Ultralight WebCore)
 else ()
     # On macOS the last two libraries are Frameworks so we must pass special flags to the linker
-    link_libraries(glfw UltralightCore "-framework Ultralight -framework WebCore -Wl,-F${ULTRALIGHT_LIBRARY_DIRS}")
+    link_libraries(glfw ${OPENGL_LIBRARIES} GLEW UltralightCore "-framework Ultralight -framework WebCore")
 endif()
 
 include_directories("${ULTRALIGHT_INCLUDE_DIRS}")
@@ -54,10 +54,10 @@ list(APPEND ULTRALIGHT_SRC
     "src/win/FontLoaderWin.cpp")
 elseif (APPLE)
 list(APPEND ULTRALIGHT_SRC
-    "src/mac/FileSystemMac.h"
-    "src/mac/FileSystemMac.mm"
-    "src/mac/FontLoaderMac.h"
-    "src/mac/FontLoaderMac.mm")
+    "src/ultralight/mac/FileSystemMac.h"
+    "src/ultralight/mac/FileSystemMac.mm"
+    "src/ultralight/mac/FontLoaderMac.h"
+    "src/ultralight/mac/FontLoaderMac.mm")
 
 set(ULTRALIGHT_LIBRARY_DIRS "${PROJECT_SOURCE_DIR}/bin/mac")
 set(ULTRALIGHT_BINARY_DIRS "${PROJECT_SOURCE_DIR}/bin/mac")
@@ -94,8 +94,8 @@ if (NOT APPLE)
 else()
     # Copy assets to target directory
     add_custom_command(TARGET App POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "$<TARGET_FILE_DIR:App>/../Resources/assets")
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/assets/ $<TARGET_FILE_DIR:App>/../Resources/assets)
     # Copy GLSL shaders to target directory
     add_custom_command(TARGET App POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "src/shaders/" "$<TARGET_FILE_DIR:App>/../Resources/assets/shaders")
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/ultralight/shaders $<TARGET_FILE_DIR:App>/../Resources/assets/shaders)
 endif ()

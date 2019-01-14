@@ -1,8 +1,7 @@
 #pragma once
 #include "gpu_driver_gl.h"
-#include <GL/glew.h>
+#include "../gl/glinclude.h"
 
-#include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <memory>
 #include <Ultralight/platform/Config.h>
@@ -10,7 +9,8 @@
 #include <Ultralight/platform/FontLoader.h>
 #include <Ultralight/platform/GPUDriver.h>
 
-ultralight::FontLoader* CreatePlatformFontLoader();
+    ultralight::FontLoader *
+    CreatePlatformFontLoader();
 ultralight::FileSystem* CreatePlatformFileSystem(const char* baseDir);
 
 class GPUContext {

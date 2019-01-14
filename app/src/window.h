@@ -1,7 +1,6 @@
 #pragma once
-#include <GL/glew.h>
+#include "gl/glinclude.h"
 
-#include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <Ultralight/KeyEvent.h>
 #include <Ultralight/Listener.h>

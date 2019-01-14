@@ -102,6 +102,7 @@ int64_t FileSystemBasic::ReadFromFile(FileHandle handle, char* data, int64_t len
   return 0;
 }
 }
+
 ultralight::FileSystem* CreatePlatformFileSystem(const char* baseDir) {
   return new ultralight::FileSystemBasic(baseDir);
 }

@@ -1,10 +1,7 @@
+#include "gl/gl.h"
 #include "engine.h"
 #include "cube.h"
-#include "gl/gl.h"
 
-#include <GL/glew.h>
-
-#include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <string>
