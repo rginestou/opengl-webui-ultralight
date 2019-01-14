@@ -1,4 +1,4 @@
-project(Ultralight C CXX)
+project(Ultralight)
 
 cmake_minimum_required(VERSION 2.8.12)
 set(CMAKE_CXX_STANDARD 11)
@@ -6,6 +6,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+if (WIN32)
+    link_directories(${PROJECT_SOURCE_DIR}/win/x64)
+elseif (APPLE)
+    link_directories(${PROJECT_SOURCE_DIR}/mac)
+elseif (UNIX)
+    link_directories(${PROJECT_SOURCE_DIR}/bin/linux)
+endif ()
 
 set(ULTRALIGHT_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include")
 set(GLFW_SOURCE_DIR "${PROJECT_SOURCE_DIR}/deps/glfw")
