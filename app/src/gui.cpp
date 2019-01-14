@@ -36,8 +36,8 @@ GUI::GUI(Window& window) : _window(window) {
   identity.SetIdentity();
 
   RenderTarget target = _view->render_target();
-  _gpu_state.viewport_width = (float)_window.width();
-  _gpu_state.viewport_height = (float)_window.height();
+  _gpu_state.viewport_width = _window.width() * _window.scale();
+  _gpu_state.viewport_height = _window.height() * _window.scale();
   _gpu_state.transform = ConvertAffineTo4x4(identity);
   _gpu_state.enable_blend = true;
   _gpu_state.enable_texturing = true;
@@ -120,8 +120,8 @@ void GUI::resize(int width, int height) {
   // Update these now since they were invalidated
   RenderTarget target = _view->render_target();
   _gpu_state.texture_1_id = target.texture_id;
-  _gpu_state.viewport_width = (float)_window.width();
-  _gpu_state.viewport_height = (float)_window.height();
+  _gpu_state.viewport_width = _window.width() * _window.scale();
+  _gpu_state.viewport_height = _window.height() * _window.scale();
 }
 
 void GUI::OnChangeCursor(ultralight::View* caller,
@@ -134,6 +134,8 @@ void GUI::onButtonClick(const JSObject& obj, const JSArgs& args) {
 }
 
 void GUI::onShowEvent(bool show) {
+  if (!setButtonText.IsValid())
+    return;
   const char* text = show ? "Hide" : "Show";
   setButtonText({ text });
 }
