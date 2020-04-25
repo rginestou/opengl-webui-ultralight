@@ -152,12 +152,12 @@ void GPUDriverGL::CreateTexture(uint32_t texture_id,
   glPixelStorei(GL_UNPACK_ROW_LENGTH, bitmap->row_bytes() / bitmap->bpp());
   CHECK_GL();
 
-  if (bitmap->format() == kBitmapFormat_A8) {
+  if (bitmap->format() == kBitmapFormat_A8_UNORM) {
     const void* pixels = bitmap->LockPixels();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, bitmap->width(), bitmap->height(), 0,
         GL_RED, GL_UNSIGNED_BYTE, pixels);
     bitmap->UnlockPixels();
-  } else if (bitmap->format() == kBitmapFormat_RGBA8) {
+  } else if (bitmap->format() == kBitmapFormat_BGRA8_UNORM_SRGB) {
     const void* pixels = bitmap->LockPixels();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap->width(), bitmap->height(), 0,
         GL_BGRA, GL_UNSIGNED_BYTE, pixels);
@@ -180,12 +180,12 @@ void GPUDriverGL::UpdateTexture(uint32_t texture_id,
   glPixelStorei(GL_UNPACK_ROW_LENGTH, bitmap->row_bytes() / bitmap->bpp());
 
   if (!bitmap->IsEmpty()) {
-    if (bitmap->format() == kBitmapFormat_A8) {
+    if (bitmap->format() == kBitmapFormat_A8_UNORM) {
       const void* pixels = bitmap->LockPixels();
       glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, bitmap->width(), bitmap->height(), 0,
           GL_RED, GL_UNSIGNED_BYTE, pixels);
       bitmap->UnlockPixels();
-    } else if (bitmap->format() == kBitmapFormat_RGBA8) {
+    } else if (bitmap->format() == kBitmapFormat_BGRA8_UNORM_SRGB) {
       const void* pixels = bitmap->LockPixels();
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bitmap->width(), bitmap->height(), 0,
           GL_BGRA, GL_UNSIGNED_BYTE, pixels);

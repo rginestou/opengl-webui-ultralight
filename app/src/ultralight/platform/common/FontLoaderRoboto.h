@@ -9,8 +9,11 @@ class FontLoaderRoboto : public FontLoader {
 public:
   FontLoaderRoboto() {}
   virtual ~FontLoaderRoboto() {}
-  virtual String16 fallback_font() const override;
-  virtual Ref<Buffer> Load(const String16& family, int weight, bool italic, float size) override;
+  String16 fallback_font() const override;
+  String16 fallback_font_for_characters(const String16& characters, int weight, bool italic, float size) const override;
+  Ref<Buffer> Load(const String16& family, int weight, bool italic, float size) override;
 };
 
 }  // namespace ultralight
+
+

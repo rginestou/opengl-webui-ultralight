@@ -138,12 +138,12 @@ void GUI::updateGeometry() {
     memcpy(_indices.data(), patternCCW, sizeof(int) * _indices.size());
 
     memset(&_gpu_state, 0, sizeof(_gpu_state));
-    ultralight::Matrix identity;
+    ultralight::Matrix4x4 identity;
     identity.SetIdentity();
 
     _gpu_state.viewport_width = (float)_window.width();
     _gpu_state.viewport_height = (float)_window.height();
-    _gpu_state.transform = ConvertAffineTo4x4(identity);
+    _gpu_state.transform = identity;
     _gpu_state.enable_blend = true;
     _gpu_state.enable_texturing = true;
     _gpu_state.shader_type = ultralight::kShaderType_Fill;
